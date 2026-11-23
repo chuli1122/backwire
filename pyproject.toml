@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "backwire"
+version = "0.1.0"
+description = "A minimal, secure reverse WebSocket remote terminal and desktop control hub"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Chuli (@chuli1122)" }]
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "websockets>=12.0",
+  "pydantic>=2.7.0",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.2.0"]
+desktop = ["pyautogui>=0.9.54", "pillow>=10.0.0", "pyperclip>=1.9.0"]
+dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "httpx>=0.27.0"]
+
+[project.scripts]
+backwire-server = "backwire.cli:main_server"
+backwire-mcp = "backwire.cli:main_mcp"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+asyncio_mode = "auto"

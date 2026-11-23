@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.backwire.client</string>
+  <key>ProgramArguments</key><array><string>/Users/REPLACE_ME/bin/run_backwire_client.sh</string></array>
+  <!-- Put BACKWIRE_* values in ~/.config/backwire/client.env and protect it with chmod 600. -->
+  <!-- The wrapper reads credentials from that file instead of putting them in this plist. -->
+  <key>RunAtLoad</key><true/><key>KeepAlive</key><true/>
+</dict></plist>

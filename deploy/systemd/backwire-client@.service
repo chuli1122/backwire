@@ -1,0 +1,15 @@
+[Unit]
+Description=backwire reverse client
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+EnvironmentFile=%h/.config/backwire/client.env
+ExecStart=/usr/bin/python3 %h/bin/backwire_client.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
