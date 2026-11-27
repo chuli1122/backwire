@@ -79,6 +79,30 @@ def test_mcp_tool_names_are_stable():
         assert set(TOOL_NAMES) <= names
 
 
+async def test_mcp_tool_annotations_are_serialized():
+    pytest.importorskip("mcp")
+    server = create_mcp_server(BackwireHub(BackwireConfig.with_tokens({"dev": "token"})))
+    expected = {
+        # readOnlyHint, destructiveHint, idempotentHint, openWorldHint
+        "list_devices": (True, False, True, False),
+        "read_file": (True, False, True, False),
+        "screenshot": (True, False, True, False),
+        "run_command": (False, True, False, True),
+        "write_file": (False, True, True, False),
+        "mouse_click": (False, True, False, False),
+        "keyboard_type": (False, True, False, False),
+        "hotkey": (False, True, False, False),
+        "scroll": (False, True, False, False),
+    }
+    tools = await server.list_tools()
+    assert {tool.name for tool in tools} == expected.keys()
+    keys = ("readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint")
+    for tool in tools:
+        hints = json.loads(tool.model_dump_json(by_alias=True, exclude_unset=True))["annotations"]
+        for key, value in zip(keys, expected[tool.name]):
+            assert hints[key] is value, (tool.name, key)
+
+
 def test_real_streamable_http_mcp_initialize_when_installed():
     try:
         create_mcp_server(BackwireHub(BackwireConfig.with_tokens({"dev": "token"})))

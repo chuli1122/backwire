@@ -7,6 +7,9 @@
 可直接嵌入 FastAPI 后端，或作为带鉴权的 Streamable HTTP / stdio MCP 服务运行。
 
 [![CI](https://github.com/chuli1122/backwire/actions/workflows/ci.yml/badge.svg)](https://github.com/chuli1122/backwire/actions/workflows/ci.yml)
+[![Stars](https://img.shields.io/github/stars/chuli1122/backwire?style=flat)](https://github.com/chuli1122/backwire/stargazers)
+[![Clones](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/chuli1122/backwire/traffic-stats/badge.json)](https://github.com/chuli1122/backwire/blob/traffic-stats/clones.json)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![MCP Optional](https://img.shields.io/badge/MCP-Optional-8A2BE2)](#方式二独立服务--mcp)

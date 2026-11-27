@@ -50,9 +50,11 @@ def create_mcp_server(hub: BackwireHub) -> Any:
     """Create an MCP server compatible with both mcp v1 (FastMCP) and v2 (MCPServer)."""
     try:
         from mcp.server.mcpserver import MCPServer as _ServerCls
+        from mcp_types import ToolAnnotations
     except ImportError:
         try:
             from mcp.server.fastmcp import FastMCP as _ServerCls  # type: ignore[no-redef]
+            from mcp.types import ToolAnnotations
         except ImportError as exc:
             raise RuntimeError("MCP support is optional; install backwire[mcp]") from exc
 
@@ -60,12 +62,17 @@ def create_mcp_server(hub: BackwireHub) -> Any:
     if not callable(getattr(server, "tool", None)):
         raise RuntimeError("installed mcp SDK does not expose a supported .tool() decorator")
 
-    @server.tool()
+    read_only = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False)
+    desktop_input = ToolAnnotations(readOnlyHint=False, destructiveHint=True, idempotentHint=False, openWorldHint=False)
+
+    @server.tool(annotations=read_only)
     async def list_devices() -> list[dict[str, Any]]:
         """List online reverse-connected devices, their kinds, and granted capabilities."""
         return await hub.list_devices()
 
-    @server.tool()
+    @server.tool(annotations=ToolAnnotations(
+        readOnlyHint=False, destructiveHint=True, idempotentHint=False, openWorldHint=True,
+    ))
     async def run_command(command: str, device: str | None = None, timeout: int = 60) -> Any:
         """Run a shell command on a connected device (requires --allow-shell on the client)."""
         checked_timeout = _timeout(timeout)
@@ -76,7 +83,7 @@ def create_mcp_server(hub: BackwireHub) -> Any:
             timeout=min(MAX_TIMEOUT, checked_timeout + 5.0),
         )
 
-    @server.tool()
+    @server.tool(annotations=read_only)
     async def read_file(
         path: str,
         device: str | None = None,
@@ -92,7 +99,9 @@ def create_mcp_server(hub: BackwireHub) -> Any:
             device=device,
         )
 
-    @server.tool()
+    @server.tool(annotations=ToolAnnotations(
+        readOnlyHint=False, destructiveHint=True, idempotentHint=True, openWorldHint=False,
+    ))
     async def write_file(path: str, content: str, device: str | None = None) -> Any:
         """Write a UTF-8 text file on a connected device (requires --allow-write)."""
         return await hub.invoke(
@@ -101,12 +110,12 @@ def create_mcp_server(hub: BackwireHub) -> Any:
             device=device,
         )
 
-    @server.tool()
+    @server.tool(annotations=read_only)
     async def screenshot(device: str | None = None) -> Any:
         """Capture a screenshot on a connected desktop device."""
         return await hub.invoke("screenshot", {}, device=device)
 
-    @server.tool()
+    @server.tool(annotations=desktop_input)
     async def mouse_click(
         x: int,
         y: int,
@@ -120,17 +129,17 @@ def create_mcp_server(hub: BackwireHub) -> Any:
             device=device,
         )
 
-    @server.tool()
+    @server.tool(annotations=desktop_input)
     async def keyboard_type(text: str, device: str | None = None) -> Any:
         """Type text on a connected desktop device (requires --allow-input)."""
         return await hub.invoke("keyboard_type", {"text": text}, device=device)
 
-    @server.tool()
+    @server.tool(annotations=desktop_input)
     async def hotkey(keys: list[str], device: str | None = None) -> Any:
         """Trigger a keyboard shortcut on a connected desktop device (requires --allow-input)."""
         return await hub.invoke("hotkey", {"keys": keys}, device=device)
 
-    @server.tool()
+    @server.tool(annotations=desktop_input)
     async def scroll(
         clicks: int = -3,
         x: int | None = None,
